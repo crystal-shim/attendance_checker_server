@@ -17,4 +17,9 @@ out/
 .vscode/
 
 ### Mac OS ###
-.DS_Store 
+.DS_Store
+
+### Google API Credentials ###
+credentials.json
+tokens/
+service-account.json 

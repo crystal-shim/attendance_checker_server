@@ -8,16 +8,17 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
 import java.time.LocalDateTime
-import java.util.*
-import kotlin.concurrent.fixedRateTimer
+import kotlin.time.Duration.Companion.minutes
 
-object SchedulerService {
-    private var timer: Timer? = null
+class SchedulerService(private val googleFormsService: GoogleFormsService) {
+    private val scope = CoroutineScope(Dispatchers.Default + Job())
+    private val checkInterval = 1.minutes
 
     fun start() {
-        timer = fixedRateTimer(name = "schedule-checker", period = 60000) { // Check every minute
-            runBlocking {
+        scope.launch {
+            while (isActive) {
                 checkUpcomingSchedules()
+                delay(checkInterval)
             }
         }
     }
@@ -33,31 +34,25 @@ object SchedulerService {
                 (Schedules.isNotified eq false)
             }.forEach { row ->
                 val scheduleId = row[Schedules.id]
-                val scheduleTime = row[Schedules.scheduledTime]
+                val title = row[Schedules.title]
                 
-                // Generate QR code
-                val qrContent = "attendance_${scheduleId}_${scheduleTime}"
-                val qrCode = QRCodeService.generateQRCode(qrContent)
+                // 구글 폼 생성
+                val formUrl = googleFormsService.createAttendanceForm(scheduleId, title)
                 
-                // Update database
+                // URL 저장 및 알림 상태 업데이트
                 Schedules.update({ Schedules.id eq scheduleId }) {
-                    it[Schedules.qrCode] = qrCode
+                    it[Schedules.formUrl] = formUrl
                     it[Schedules.isNotified] = true
                 }
-                
-                // Send to KakaoTalk (This is a placeholder - you'll need to implement actual Kakao API integration)
-                sendToKakaoTalk(qrCode)
+
+                // 카카오톡으로 URL 전송
+                sendToKakaoTalk(formUrl)
             }
         }
     }
 
-    private fun sendToKakaoTalk(qrCode: String) {
-        // TODO: Implement Kakao API integration
-        println("Sending QR code to KakaoTalk: $qrCode")
-    }
-
-    fun stop() {
-        timer?.cancel()
-        timer = null
+    private fun sendToKakaoTalk(formUrl: String) {
+        // 카카오톡 메시지 전송 로직 구현
+        println("Sending form URL to KakaoTalk: $formUrl")
     }
 } 

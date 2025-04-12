@@ -7,6 +7,7 @@ import io.ktor.server.request.*
 import com.attendance.models.Schedule
 import com.attendance.database.DatabaseFactory.dbQuery
 import com.attendance.models.Schedules
+import com.attendance.services.FormUrlService
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDateTime
 
@@ -24,7 +25,7 @@ fun Application.configureRouting() {
                         id = row[Schedules.id],
                         title = row[Schedules.title],
                         scheduledTime = row[Schedules.scheduledTime].toString(),
-                        qrCode = row[Schedules.qrCode],
+                        formUrl = row[Schedules.formUrl],
                         isNotified = row[Schedules.isNotified]
                     )
                 }
@@ -40,7 +41,7 @@ fun Application.configureRouting() {
                         id = row[Schedules.id],
                         title = row[Schedules.title],
                         scheduledTime = row[Schedules.scheduledTime].toString(),
-                        qrCode = row[Schedules.qrCode],
+                        formUrl = row[Schedules.formUrl],
                         isNotified = row[Schedules.isNotified]
                     )
                 }
@@ -57,7 +58,7 @@ fun Application.configureRouting() {
                         id = row[Schedules.id],
                         title = row[Schedules.title],
                         scheduledTime = row[Schedules.scheduledTime].toString(),
-                        qrCode = row[Schedules.qrCode],
+                        formUrl = row[Schedules.formUrl],
                         isNotified = row[Schedules.isNotified]
                     )
                 }.singleOrNull()

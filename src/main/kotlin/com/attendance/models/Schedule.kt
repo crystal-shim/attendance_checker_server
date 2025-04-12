@@ -10,7 +10,7 @@ data class Schedule(
     val id: Int = 0,
     val title: String,
     val scheduledTime: String,
-    val qrCode: String? = null,
+    val formUrl: String? = null,
     val isNotified: Boolean = false
 )
 
@@ -18,7 +18,7 @@ object Schedules : Table() {
     val id = integer("id").autoIncrement()
     val title = varchar("title", 128)
     val scheduledTime = datetime("scheduled_time")
-    val qrCode = text("qr_code").nullable()
+    val formUrl = varchar("form_url", 512).nullable()
     val isNotified = bool("is_notified").default(false)
 
     override val primaryKey = PrimaryKey(id)
