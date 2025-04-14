@@ -63,6 +63,7 @@ class GoogleFormsService {
                 Request().apply {
                     createItem = CreateItemRequest().apply {
                         item = Item().apply {
+                            setTitle("이름")
                             questionItem = QuestionItem().apply {
                                 question = Question().apply {
                                     required = true
@@ -70,7 +71,6 @@ class GoogleFormsService {
                                         paragraph = false
                                     }
                                 }
-                                title = "이름"
                             }
                         }
                         location = Location().apply {
@@ -82,19 +82,18 @@ class GoogleFormsService {
                     createItem = CreateItemRequest().apply {
                         item = Item().apply {
                             questionItem = QuestionItem().apply {
+                                setTitle("조")
                                 question = Question().apply {
                                     required = true
                                     choiceQuestion = ChoiceQuestion().apply {
                                         type = "RADIO"
-                                        options = listOf(
-                                            Option().set("value", "A조"),
-                                            Option().set("value", "B조"),
-                                            Option().set("value", "C조"),
-                                            Option().set("value", "N조")
-                                        )
+                                        options = listOf("A조", "B조", "C조", "N조").map { value ->
+                                            Option().apply { 
+                                                this.value = value
+                                            }
+                                        }
                                     }
                                 }
-                                title = "조"
                             }
                         }
                         location = Location().apply {
@@ -106,18 +105,6 @@ class GoogleFormsService {
         }
 
         forms.forms().batchUpdate(createdForm.formId, updateRequest).execute()
-
-        // 응답 수집 설정
-        val settings = UpdateFormInfoRequest().apply {
-            info = Info().apply {
-                collectsEmail = true
-                isQuiz = false
-            }
-            updateMask = "collectsEmail,isQuiz"
-        }
-
-        forms.forms().updateSettings(createdForm.formId, settings).execute()
-
         return "https://docs.google.com/forms/d/${createdForm.formId}/viewform"
     }
 } 

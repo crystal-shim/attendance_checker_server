@@ -6,7 +6,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import com.attendance.plugins.*
-import com.attendance.models.DatabaseFactory
+import com.attendance.database.DatabaseFactory
 import com.attendance.models.Schedule
 import com.attendance.services.GoogleFormsService
 import com.attendance.services.SchedulerService
