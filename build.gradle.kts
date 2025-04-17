@@ -55,6 +55,14 @@ dependencies {
     implementation("com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0")
 
     // Testing
-    testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
+    testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("com.h2database:h2:$h2_version")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+}
+
+tasks.test {
+    useJUnit()
+    jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
 } 
