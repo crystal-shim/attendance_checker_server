@@ -77,29 +77,6 @@ class GoogleFormsService {
                             index = 0
                         }
                     }
-                },
-                Request().apply {
-                    createItem = CreateItemRequest().apply {
-                        item = Item().apply {
-                            questionItem = QuestionItem().apply {
-                                setTitle("조")
-                                question = Question().apply {
-                                    required = true
-                                    choiceQuestion = ChoiceQuestion().apply {
-                                        type = "RADIO"
-                                        options = listOf("A조", "B조", "C조", "N조").map { value ->
-                                            Option().apply { 
-                                                this.value = value
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        location = Location().apply {
-                            index = 1
-                        }
-                    }
                 }
             )
         }
