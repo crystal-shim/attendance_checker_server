@@ -12,6 +12,7 @@ import com.attendance.services.GoogleFormsService
 import com.attendance.services.SchedulerService
 import kotlinx.serialization.json.Json
 import kotlinx.coroutines.runBlocking
+import io.ktor.server.plugins.cors.routing.*
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
@@ -21,6 +22,21 @@ fun main() {
 fun Application.module() {
     // Initialize database
     DatabaseFactory.init()
+
+    // Install CORS
+    install(CORS) {
+        allowHost("localhost:3000")
+        allowHost("127.0.0.1:3000")
+        allowMethod(io.ktor.http.HttpMethod.Options)
+        allowMethod(io.ktor.http.HttpMethod.Get)
+        allowMethod(io.ktor.http.HttpMethod.Post)
+        allowMethod(io.ktor.http.HttpMethod.Put)
+        allowMethod(io.ktor.http.HttpMethod.Delete)
+        allowHeader("Authorization")
+        allowHeader("Content-Type")
+        allowCredentials = true
+        maxAgeInSeconds = 3600
+    }
 
     // Install plugins
     install(ContentNegotiation) {
