@@ -34,14 +34,10 @@ class SchedulerService(private val googleFormsService: GoogleFormsService) {
                 (Schedules.isNotified eq false)
             }.forEach { row ->
                 val scheduleId = row[Schedules.id]
-                val title = row[Schedules.title]
+                val formUrl = row[Schedules.formUrl] ?: return@forEach
                 
-                // 구글 폼 생성
-                val formUrl = googleFormsService.createAttendanceForm(scheduleId, title)
-                
-                // URL 저장 및 알림 상태 업데이트
+                // URL이 이미 있으므로 알림 상태만 업데이트
                 Schedules.update({ Schedules.id eq scheduleId }) {
-                    it[Schedules.formUrl] = formUrl
                     it[Schedules.isNotified] = true
                 }
 

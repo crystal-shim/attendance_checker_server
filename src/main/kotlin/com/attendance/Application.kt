@@ -34,6 +34,6 @@ fun Application.module() {
     val schedulerService = SchedulerService(googleFormsService)
     schedulerService.start()
 
-    // Configure routes
-    configureRouting()
+    // Configure routes with GoogleFormsService
+    configureRouting(googleFormsService)
 } 

@@ -7,29 +7,40 @@ import io.ktor.server.request.*
 import com.attendance.models.Schedule
 import com.attendance.database.DatabaseFactory.dbQuery
 import com.attendance.models.Schedules
+import com.attendance.services.GoogleFormsService
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDateTime
 
-fun Application.configureRouting() {
+fun Application.configureRouting(googleFormsService: GoogleFormsService) {
     routing {
         // Create new schedule
         post("/schedule") {
             val schedule = call.receive<Schedule>()
             val result = dbQuery {
-                Schedules.insert {
+                // Insert schedule first to get the ID
+                val insertedRow = Schedules.insert {
                     it[title] = schedule.title
                     it[scheduledTime] = LocalDateTime.parse(schedule.scheduledTime)
-                }.resultedValues?.firstOrNull()?.let { row ->
-                    Schedule(
-                        id = row[Schedules.id],
-                        title = row[Schedules.title],
-                        scheduledTime = row[Schedules.scheduledTime].toString(),
-                        formUrl = row[Schedules.formUrl],
-                        isNotified = row[Schedules.isNotified]
-                    )
+                }.resultedValues?.firstOrNull() ?: error("Failed to create schedule")
+
+                // Create Google Form
+                val formUrl = googleFormsService.createAttendanceForm(insertedRow[Schedules.id], insertedRow[Schedules.title])
+
+                // Update the schedule with form URL
+                Schedules.update({ Schedules.id eq insertedRow[Schedules.id] }) {
+                    it[Schedules.formUrl] = formUrl
                 }
+
+                // Return the complete schedule
+                Schedule(
+                    id = insertedRow[Schedules.id],
+                    title = insertedRow[Schedules.title],
+                    scheduledTime = insertedRow[Schedules.scheduledTime].toString(),
+                    formUrl = formUrl,
+                    isNotified = insertedRow[Schedules.isNotified]
+                )
             }
-            call.respond(result ?: error("Failed to create schedule"))
+            call.respond(result)
         }
 
         // Get all schedules
