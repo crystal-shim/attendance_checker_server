@@ -13,6 +13,7 @@ import com.attendance.services.SchedulerService
 import kotlinx.serialization.json.Json
 import kotlinx.coroutines.runBlocking
 import io.ktor.server.plugins.cors.routing.*
+import io.ktor.http.*
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
@@ -25,15 +26,26 @@ fun Application.module() {
 
     // Install CORS
     install(CORS) {
+        // 로컬 개발 환경 
         allowHost("localhost:3000")
         allowHost("127.0.0.1:3000")
-        allowMethod(io.ktor.http.HttpMethod.Options)
-        allowMethod(io.ktor.http.HttpMethod.Get)
-        allowMethod(io.ktor.http.HttpMethod.Post)
-        allowMethod(io.ktor.http.HttpMethod.Put)
-        allowMethod(io.ktor.http.HttpMethod.Delete)
-        allowHeader("Authorization")
-        allowHeader("Content-Type")
+        
+        // 프로덕션 환경
+        allowHost("www.elrc.run")
+        
+        // HTTP 메서드 허용
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        
+        // 필요한 헤더 허용
+        allowHeader(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Accept)
+        
+        // 자격 증명 허용 (쿠키 등)
         allowCredentials = true
         maxAgeInSeconds = 3600
     }
