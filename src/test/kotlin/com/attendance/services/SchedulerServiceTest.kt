@@ -24,6 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 class SchedulerServiceTest {
     private lateinit var schedulerService: SchedulerService
     private lateinit var mockGoogleFormsService: GoogleFormsService
+    private lateinit var mockNotionService: NotionService
     private val koreaZoneId = ZoneId.of("Asia/Seoul")
     
     @Before
@@ -36,9 +37,12 @@ class SchedulerServiceTest {
             SchemaUtils.create(Schedules)
         }
         
-        // Mock GoogleFormsService
+        // Mock services
         mockGoogleFormsService = mockk()
-        schedulerService = spyk(SchedulerService(mockGoogleFormsService))
+        mockNotionService = mockk()
+        coEvery { mockNotionService.createAttendancePage(any(), any()) } just Runs
+        
+        schedulerService = spyk(SchedulerService(mockGoogleFormsService, mockNotionService))
         schedulerService.resetLastCreationDates()
     }
     

@@ -15,7 +15,10 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 
-class GoogleFormsService {
+class GoogleFormsService(
+    private val credentialsPath: String,
+    private val tokensPath: String
+) {
     private val jsonFactory = GsonFactory.getDefaultInstance()
     private val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
     private val scopes = listOf(FormsScopes.FORMS_BODY)
@@ -28,7 +31,7 @@ class GoogleFormsService {
     }
 
     private fun getCredentials(): Credential {
-        val credentialsFile = File("credentials.json")
+        val credentialsFile = File(credentialsPath)
         val clientSecrets = GoogleClientSecrets.load(
             jsonFactory,
             InputStreamReader(FileInputStream(credentialsFile))
@@ -37,7 +40,7 @@ class GoogleFormsService {
         val flow = GoogleAuthorizationCodeFlow.Builder(
             httpTransport, jsonFactory, clientSecrets, scopes
         )
-            .setDataStoreFactory(FileDataStoreFactory(File("tokens")))
+            .setDataStoreFactory(FileDataStoreFactory(File(tokensPath)))
             .setAccessType("offline")
             .build()
 

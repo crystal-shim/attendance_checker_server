@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.update
 import java.time.*
 import kotlin.time.Duration.Companion.minutes
 
-class SchedulerService(private val googleFormsService: GoogleFormsService) {
+class SchedulerService(private val googleFormsService: GoogleFormsService, private val notionService: NotionService) {
     private val scope = CoroutineScope(Dispatchers.Default + Job())
     private val checkInterval = 1.minutes
     private val koreaZoneId = ZoneId.of("Asia/Seoul")
@@ -108,6 +108,7 @@ class SchedulerService(private val googleFormsService: GoogleFormsService) {
                     it[Schedules.formUrl] = formUrl
                     it[Schedules.isNotified] = false
                 }
+                notionService.createAttendancePage(title, formUrl)
             }
         }
     }

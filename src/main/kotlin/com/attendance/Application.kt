@@ -9,11 +9,13 @@ import com.attendance.plugins.*
 import com.attendance.database.DatabaseFactory
 import com.attendance.models.Schedule
 import com.attendance.services.GoogleFormsService
+import com.attendance.services.NotionService
 import com.attendance.services.SchedulerService
 import kotlinx.serialization.json.Json
 import kotlinx.coroutines.runBlocking
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.http.*
+import java.io.File
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
@@ -58,8 +60,21 @@ fun Application.module() {
         })
     }
 
-    val googleFormsService = GoogleFormsService()
-    val schedulerService = SchedulerService(googleFormsService)
+    val googleFormsService = GoogleFormsService(
+        credentialsPath = "credentials.json",
+        tokensPath = "tokens"
+    )
+    
+    // Read Notion credentials from file
+    val notionCredentialsFile = File("notion-credentials.json")
+    val notionCredentials = Json.decodeFromString<Map<String, String>>(notionCredentialsFile.readText())
+    
+    val notionService = NotionService(
+        token = notionCredentials["token"] ?: throw IllegalStateException("Notion token not found in credentials file"),
+        databaseId = notionCredentials["database_id"] ?: throw IllegalStateException("Notion database ID not found in credentials file")
+    )
+
+    val schedulerService = SchedulerService(googleFormsService, notionService)
     schedulerService.start()
 
     // Configure routes with GoogleFormsService

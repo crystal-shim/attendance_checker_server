@@ -7,6 +7,7 @@ val postgresql_version: String by project
 
 plugins {
     kotlin("jvm") version "1.9.22"
+    kotlin("kapt") version "1.9.22"
     id("io.ktor.plugin") version "2.3.7"
     kotlin("plugin.serialization") version "1.9.22"
 }
@@ -60,6 +61,17 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.8")
     testImplementation("com.h2database:h2:$h2_version")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // Moshi dependencies
+    implementation("com.squareup.moshi:moshi:1.15.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
+    kapt("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
+
+    // Ktor client dependencies
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-client-logging:$ktor_version")
 }
 
 tasks.test {
