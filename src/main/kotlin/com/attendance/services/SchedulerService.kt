@@ -1,17 +1,13 @@
 package com.attendance.services
 
-import com.attendance.database.DatabaseFactory.dbQuery
-import com.attendance.models.Schedules
 import kotlinx.coroutines.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.update
 import java.time.*
 import kotlin.time.Duration.Companion.minutes
 
-class SchedulerService(private val googleFormsService: GoogleFormsService, private val notionService: NotionService) {
+class SchedulerService(
+    private val googleFormsService: GoogleFormsService, 
+    private val notionService: NotionService
+) {
     private val scope = CoroutineScope(Dispatchers.Default + Job())
     private val checkInterval = 1.minutes
     private val koreaZoneId = ZoneId.of("Asia/Seoul")
@@ -21,7 +17,6 @@ class SchedulerService(private val googleFormsService: GoogleFormsService, priva
     fun start() {
         scope.launch {
             while (isActive) {
-                checkUpcomingSchedules()
                 createRegularSchedules()
                 delay(checkInterval)
             }
@@ -40,7 +35,7 @@ class SchedulerService(private val googleFormsService: GoogleFormsService, priva
             
             // 오늘 해당 요일의 스케줄을 아직 생성하지 않았다면 생성
             if (lastCreationDate != today) {
-                createScheduleIfNotExists(nextSchedule)
+                createSchedule(nextSchedule)
                 if (isWednesday) {
                     lastWednesdayCreationDate = today
                 } else {
@@ -83,56 +78,18 @@ class SchedulerService(private val googleFormsService: GoogleFormsService, priva
         return scheduleTime
     }
 
-    internal suspend fun createScheduleIfNotExists(scheduleTime: ZonedDateTime) {
-        val localDateTime = scheduleTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime()
+    internal suspend fun createSchedule(scheduleTime: ZonedDateTime) {
+        val title = when (scheduleTime.dayOfWeek) {
+            DayOfWeek.WEDNESDAY -> "수요일 저녁 출석체크"
+            DayOfWeek.SATURDAY -> "토요일 오전 출석체크"
+            else -> "출석체크"
+        }
+
+        // Google Form 생성
+        val formUrl = googleFormsService.createAttendanceForm(0, title)
         
-        dbQuery {
-            val exists = Schedules.select {
-                Schedules.scheduledTime eq localDateTime
-            }.count() > 0
-
-            if (!exists) {
-                val title = when (scheduleTime.dayOfWeek) {
-                    DayOfWeek.WEDNESDAY -> "수요일 저녁 출석체크"
-                    DayOfWeek.SATURDAY -> "토요일 오전 출석체크"
-                    else -> "출석체크"
-                }
-
-                // Google Form 생성
-                val formUrl = googleFormsService.createAttendanceForm(0, title)
-
-                // 스케줄 생성 (UTC 시간으로 저장)
-                Schedules.insert {
-                    it[Schedules.title] = title
-                    it[Schedules.scheduledTime] = localDateTime
-                    it[Schedules.formUrl] = formUrl
-                    it[Schedules.isNotified] = false
-                }
-                notionService.createAttendancePage(title, formUrl)
-            }
-        }
-    }
-
-    private suspend fun checkUpcomingSchedules() {
-        val now = ZonedDateTime.now(koreaZoneId)
-        val oneHourLater = now.plusHours(1)
-        val nowUtc = now.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime()
-        val oneHourLaterUtc = oneHourLater.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime()
-
-        dbQuery {
-            Schedules.select {
-                (Schedules.scheduledTime greater nowUtc) and
-                (Schedules.scheduledTime lessEq oneHourLaterUtc) and
-                (Schedules.isNotified eq false)
-            }.forEach { row ->
-                val scheduleId = row[Schedules.id]
-                
-                // Update notification status
-                Schedules.update({ Schedules.id eq scheduleId }) {
-                    it[Schedules.isNotified] = true
-                }
-            }
-        }
+        // Notion 페이지 생성
+        notionService.createAttendancePage(title, formUrl)
     }
 
     // For testing purposes

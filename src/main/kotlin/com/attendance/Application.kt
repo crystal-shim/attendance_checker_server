@@ -6,7 +6,6 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import com.attendance.plugins.*
-import com.attendance.database.DatabaseFactory
 import com.attendance.models.Schedule
 import com.attendance.services.GoogleFormsService
 import com.attendance.services.NotionService
@@ -23,9 +22,6 @@ fun main() {
 }
 
 fun Application.module() {
-    // Initialize database
-    DatabaseFactory.init()
-
     // Install CORS
     install(CORS) {
         // 로컬 개발 환경 
