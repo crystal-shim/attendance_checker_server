@@ -22,4 +22,7 @@ out/
 ### Google API Credentials ###
 credentials.json
 tokens/
-service-account.json 
+service-account.json
+
+### Notion Credentials ###
+notion-credentials.json 
