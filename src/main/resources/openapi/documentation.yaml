@@ -1,0 +1,105 @@
+openapi: "3.0.3"
+info:
+  title: "Attendance Checker API"
+  description: "출석체크 폼 생성 및 관리를 위한 API"
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+  - url: https://api.elrc.run
+    description: Production server
+
+paths:
+  /schedule:
+    post:
+      summary: "Create a new attendance schedule"
+      description: "새로운 출석체크 스케줄을 생성합니다"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScheduleRequest"
+      responses:
+        "200":
+          description: "Successfully created schedule"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Schedule"
+        "400":
+          description: "Invalid request"
+        "500":
+          description: "Internal server error"
+          
+  /schedule/batch:
+    post:
+      summary: "Create schedules from today until next Sunday"
+      description: "오늘부터 다음주 일요일까지의 모든 정기 스케줄을 생성합니다"
+      responses:
+        "200":
+          description: "Successfully created schedules"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "처리 결과 메시지"
+                    example: "Successfully created 2 schedules"
+                  schedules:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Schedule"
+        "500":
+          description: "Internal server error"
+
+components:
+  schemas:
+    ScheduleRequest:
+      type: object
+      required:
+        - title
+        - scheduledTime
+      properties:
+        title:
+          type: string
+          description: "출석체크 제목"
+          example: "수요일 저녁 출석체크"
+        scheduledTime:
+          type: string
+          format: date-time
+          description: "출석체크 예정 시간 (ISO-8601 format)"
+          example: "2024-04-24T20:30:00"
+
+    Schedule:
+      type: object
+      required:
+        - title
+        - scheduledTime
+        - formUrl
+        - responseUrl
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: "스케줄 ID"
+          example: 1
+        title:
+          type: string
+          description: "출석체크 제목"
+          example: "수요일 저녁 출석체크"
+        scheduledTime:
+          type: string
+          format: date-time
+          description: "출석체크 예정 시간"
+          example: "2024-04-24T20:30:00"
+        formUrl:
+          type: string
+          description: "Google Forms URL"
+          example: "https://docs.google.com/forms/d/xxx/viewform"
+        responseUrl:
+          type: string
+          description: "Google Forms 응답 URL"
+          example: "https://docs.google.com/forms/d/xxx/edit" 

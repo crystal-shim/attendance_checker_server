@@ -57,6 +57,9 @@ fun Application.module() {
         })
     }
 
+    // Configure OpenAPI documentation
+    configureOpenAPI()
+
     // Read Notion credentials from file
     val notionCredentialsFile = File("notion-credentials.json")
     val notionCredentials = Json.decodeFromString<Map<String, String>>(notionCredentialsFile.readText())

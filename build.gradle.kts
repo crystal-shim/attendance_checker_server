@@ -31,6 +31,10 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     implementation("io.ktor:ktor-server-sessions:$ktor_version")
     implementation("io.ktor:ktor-server-status-pages:$ktor_version")
+    
+    // Swagger dependencies
+    implementation("io.ktor:ktor-server-swagger:$ktor_version")
+    implementation("io.ktor:ktor-server-openapi:$ktor_version")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:$logback_version")
