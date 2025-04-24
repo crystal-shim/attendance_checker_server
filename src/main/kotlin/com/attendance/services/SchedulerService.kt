@@ -86,10 +86,10 @@ class SchedulerService(
         }
 
         // Google Form 생성
-        val formUrl = googleFormsService.createAttendanceForm(0, title)
+        val (formUrl, responseUrl) = googleFormsService.createAttendanceForm(0, title)
         
         // Notion 페이지 생성
-        notionService.createAttendancePage(title, formUrl)
+        notionService.createAttendancePage(title, formUrl, responseUrl)
     }
 
     // For testing purposes

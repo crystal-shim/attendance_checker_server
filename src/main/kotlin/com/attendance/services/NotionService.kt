@@ -22,7 +22,7 @@ class NotionService(
         }
     }
 
-    suspend fun createAttendancePage(title: String, formUrl: String) {
+    suspend fun createAttendancePage(title: String, formUrl: String, responseUrl: String) {
         client.post("$NOTION_API_URL/pages") {
             contentType(ContentType.Application.Json)
             header("Authorization", "Bearer $token")
@@ -43,6 +43,9 @@ class NotionService(
                     })
                     put("Form URL", buildJsonObject {
                         put("url", formUrl)
+                    })
+                    put("Response URL", buildJsonObject {
+                        put("url", responseUrl)
                     })
                 })
             })

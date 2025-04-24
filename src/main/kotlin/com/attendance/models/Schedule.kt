@@ -8,5 +8,6 @@ data class Schedule(
     val id: Int = 0,
     val title: String,
     val scheduledTime: String,
-    val formUrl: String? = null
+    val formUrl: String,
+    val responseUrl: String
 ) 

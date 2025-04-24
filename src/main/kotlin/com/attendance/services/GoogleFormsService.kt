@@ -15,6 +15,11 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 
+data class FormUrls(
+    val formUrl: String,
+    val responseUrl: String
+)
+
 class GoogleFormsService(
     private val credentialsPath: String,
     private val tokensPath: String
@@ -48,7 +53,7 @@ class GoogleFormsService(
         return AuthorizationCodeInstalledApp(flow, receiver).authorize("user")
     }
 
-    suspend fun createAttendanceForm(scheduleId: Int, title: String): String {
+    suspend fun createAttendanceForm(scheduleId: Int, title: String): FormUrls {
         // 폼 생성
         val form = Form().apply {
             this.info = Info().apply {
@@ -85,6 +90,10 @@ class GoogleFormsService(
         }
 
         forms.forms().batchUpdate(createdForm.formId, updateRequest).execute()
-        return "https://docs.google.com/forms/d/${createdForm.formId}/viewform"
+        
+        return FormUrls(
+            formUrl = "https://docs.google.com/forms/d/${createdForm.formId}/viewform",
+            responseUrl = "https://docs.google.com/forms/d/${createdForm.formId}/responses"
+        )
     }
 } 
