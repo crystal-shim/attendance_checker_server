@@ -93,7 +93,8 @@ class GoogleFormsService(
         
         return FormUrls(
             formUrl = "https://docs.google.com/forms/d/${createdForm.formId}/viewform",
-            responseUrl = "https://docs.google.com/forms/d/${createdForm.formId}/responses"
+            responseUrl = "https://docs.google.com/forms/d/${createdForm.formId}/edit"
         )
+        // https://docs.google.com/forms/d/19v6L9Z_1nzifYyF78l3qNui5A_xzMN6ARAaCBc-kCqg/edit
     }
 } 
