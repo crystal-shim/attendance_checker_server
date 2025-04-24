@@ -15,6 +15,7 @@ import kotlinx.coroutines.runBlocking
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.http.*
 import java.io.File
+import com.attendance.services.AttendanceService
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
@@ -56,23 +57,21 @@ fun Application.module() {
         })
     }
 
+    // Read Notion credentials from file
+    val notionCredentialsFile = File("notion-credentials.json")
+    val notionCredentials = Json.decodeFromString<Map<String, String>>(notionCredentialsFile.readText())
+
     val googleFormsService = GoogleFormsService(
         credentialsPath = "credentials.json",
         tokensPath = "tokens"
     )
-    
-    // Read Notion credentials from file
-    val notionCredentialsFile = File("notion-credentials.json")
-    val notionCredentials = Json.decodeFromString<Map<String, String>>(notionCredentialsFile.readText())
-    
     val notionService = NotionService(
         token = notionCredentials["token"] ?: throw IllegalStateException("Notion token not found in credentials file"),
         databaseId = notionCredentials["database_id"] ?: throw IllegalStateException("Notion database ID not found in credentials file")
     )
+    val attendanceService = AttendanceService(googleFormsService, notionService)
+    val schedulerService = SchedulerService(attendanceService)
 
-    val schedulerService = SchedulerService(googleFormsService, notionService)
+    configureRouting(attendanceService)
     schedulerService.start()
-
-    // Configure routes with GoogleFormsService
-    configureRouting(googleFormsService)
 } 

@@ -5,8 +5,7 @@ import java.time.*
 import kotlin.time.Duration.Companion.minutes
 
 class SchedulerService(
-    private val googleFormsService: GoogleFormsService, 
-    private val notionService: NotionService
+    private val attendanceService: AttendanceService
 ) {
     private val scope = CoroutineScope(Dispatchers.Default + Job())
     private val checkInterval = 1.minutes
@@ -85,16 +84,7 @@ class SchedulerService(
             else -> "출석체크"
         }
 
-        // Google Form 생성
-        val (formUrl, responseUrl) = googleFormsService.createAttendanceForm(0, title)
-        
-        // Notion 페이지 생성
-        notionService.createAttendancePage(
-            title = title,
-            formUrl = formUrl,
-            responseUrl = responseUrl,
-            scheduledTime = scheduleTime.toLocalDateTime()
-        )
+        attendanceService.createAttendanceForm(title, scheduleTime.toLocalDateTime())
     }
 
     // For testing purposes
