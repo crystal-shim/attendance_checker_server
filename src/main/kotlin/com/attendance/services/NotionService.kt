@@ -8,6 +8,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class NotionService(
     private val token: String,
@@ -22,7 +24,12 @@ class NotionService(
         }
     }
 
-    suspend fun createAttendancePage(title: String, formUrl: String, responseUrl: String) {
+    suspend fun createAttendancePage(
+        title: String,
+        formUrl: String,
+        responseUrl: String,
+        scheduledTime: LocalDateTime
+    ) {
         client.post("$NOTION_API_URL/pages") {
             contentType(ContentType.Application.Json)
             header("Authorization", "Bearer $token")
@@ -46,6 +53,11 @@ class NotionService(
                     })
                     put("Response URL", buildJsonObject {
                         put("url", responseUrl)
+                    })
+                    put("Date", buildJsonObject {
+                        put("date", buildJsonObject {
+                            put("start", scheduledTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                        })
                     })
                 })
             })
