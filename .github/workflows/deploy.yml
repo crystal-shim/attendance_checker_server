@@ -45,12 +45,12 @@ jobs:
 
       - name: Create notion-credentials.json
         run: |
-          echo CREDENTIALS | base64 >> notion-credentials.json
+          echo $CREDENTIALS | base64 >> notion-credentials.json
         env:
           CREDENTIALS: ${{secrets.NOTION_CREDENTIALS}}
 
       - name: Deploy to Railway
         uses: bervProject/railway-deploy@main
         with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          railway_token: ${{secrets.RAILWAY_TOKEN}}
           service: "ELRC_attendance"
