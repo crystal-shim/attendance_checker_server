@@ -76,3 +76,7 @@ tasks.register<Jar>("fatJar") {
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
     with(tasks.jar.get() as CopySpec)
 }
+
+bootJar {
+    archiveFileName = 'app.jar' // JAR 이름 간단하게 지정
+}
