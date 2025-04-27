@@ -21,6 +21,9 @@ repositories {
 }
 
 dependencies {
+    // JSON 직렬화/역직렬화
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")  // 최신 버전 확인 필요
+    
     // Ktor server dependencies
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
@@ -49,6 +52,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("io.mockk:mockk:1.13.8")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    
 
     // Moshi dependencies
     implementation("com.squareup.moshi:moshi:1.15.0")
