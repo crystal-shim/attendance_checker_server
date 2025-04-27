@@ -65,4 +65,14 @@ dependencies {
 tasks.test {
     useJUnit()
     jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
-} 
+}
+
+tasks.register<Jar>("fatJar") {
+    archiveClassifier.set("all")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes["Main-Class"] = "com.attendance.ApplicationKt"
+    }
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    with(tasks.jar.get() as CopySpec)
+}
