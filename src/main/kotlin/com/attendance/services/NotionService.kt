@@ -26,6 +26,7 @@ class NotionService(
 
     suspend fun createAttendancePage(
         title: String,
+        qrUrl: String,
         formUrl: String,
         responseUrl: String,
         scheduledTime: LocalDateTime
@@ -47,6 +48,9 @@ class NotionService(
                                 })
                             })
                         })
+                    })
+                    put("QR URL", buildJsonObject {
+                        put("url", qrUrl)
                     })
                     put("Form URL", buildJsonObject {
                         put("url", formUrl)
