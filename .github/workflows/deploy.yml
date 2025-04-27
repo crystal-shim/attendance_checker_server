@@ -50,7 +50,7 @@ jobs:
           CREDENTIALS: ${{secrets.NOTION_CREDENTIALS}}
 
       - name: Deploy to Railway
-        uses: bervProject/railway-deploy@main
-        with:
-          railway_token: ${{secrets.RAILWAY_TOKEN}}
+        run: railway up --service=ELRC_attendance
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           service: "ELRC_attendance"
