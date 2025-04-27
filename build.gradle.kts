@@ -77,6 +77,6 @@ tasks.register<Jar>("fatJar") {
     with(tasks.jar.get() as CopySpec)
 }
 
-bootJar {
-    archiveFileName = 'app.jar' // JAR 이름 간단하게 지정
+tasks.named<Jar>("jar") {
+    archiveFileName.set("app.jar")
 }
