@@ -42,13 +42,13 @@ jobs:
           if [ -f notion-credentials.json ]; then
             rm notion-credentials.json
           fi
-
       - name: Create notion-credentials.json
         run: |
           echo $CREDENTIALS | base64 >> notion-credentials.json
         env:
           CREDENTIALS: ${{secrets.NOTION_CREDENTIALS}}
-
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli@3.14.0
       - name: Deploy to Railway
         run: railway up --service=ELRC_attendance
         env:
