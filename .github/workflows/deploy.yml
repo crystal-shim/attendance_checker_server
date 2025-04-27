@@ -53,4 +53,4 @@ jobs:
         uses: bervProject/railway-deploy@main
         with:
           railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: "ELRC attendance checker server"
+          service: "ELRC_attendance"
