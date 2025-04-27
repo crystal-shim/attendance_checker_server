@@ -75,6 +75,6 @@ fun Application.module() {
     val attendanceService = AttendanceService(googleFormsService, notionService)
     val schedulerService = SchedulerService(attendanceService)
 
-    configureRouting(attendanceService, schedulerService)
+    configureRouting(attendanceService, notionService, schedulerService)
     schedulerService.start()
 } 
