@@ -80,3 +80,9 @@ tasks.register<Jar>("fatJar") {
 tasks.named<Jar>("jar") {
     archiveFileName.set("app.jar")
 }
+
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = "ApplicationKt"
+    }
+}
