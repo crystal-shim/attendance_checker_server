@@ -6,7 +6,7 @@ import java.util.UUID
 
 @Serializable
 data class Schedule(
-    val id: String = UUID.randomUUID().toString(),
+    val id: String,
     val title: String,
     val scheduledTime: String,
     val formUrl: String,

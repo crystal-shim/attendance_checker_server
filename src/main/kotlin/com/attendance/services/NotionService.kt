@@ -56,14 +56,8 @@ class NotionService(
         }
     }
 
-    suspend fun createAttendancePage(
-        title: String,
-        formUrl: String,
-        responseUrl: String,
-        scheduledTime: LocalDateTime
-    ) {
-        val id = UUID.randomUUID().toString()
-        println("createAttendancePage() id: $id")
+    suspend fun createAttendancePage(schedule: Schedule) {
+        println("createAttendancePage() schedule: $schedule")
         val body = buildJsonObject {
             put("parent", buildJsonObject {
                 put("database_id", databaseId)
@@ -73,30 +67,30 @@ class NotionService(
                     put("title", buildJsonArray {
                         add(buildJsonObject {
                             put("text", buildJsonObject {
-                                put("content", title)
+                                put("content", schedule.title)
                             })
                         })
                     })
                 })
                 put("QR URL", buildJsonObject {
-                    put("url", createQRUrl(id))
+                    put("url", createQRUrl(schedule.id))
                 })
                 put("Form URL", buildJsonObject {
-                    put("url", formUrl)
+                    put("url", schedule.formUrl)
                 })
                 put("Response URL", buildJsonObject {
-                    put("url", responseUrl)
+                    put("url", schedule.responseUrl)
                 })
                 put("Date", buildJsonObject {
                     put("date", buildJsonObject {
-                        put("start", scheduledTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                        put("start", schedule.scheduledTime)
                     })
                 })
                 put("id", buildJsonObject {
                     put("rich_text", buildJsonArray {
                         add(buildJsonObject {
                             put("text", buildJsonObject {
-                                put("content", id)
+                                put("content", schedule.id)
                             })
                         })
                     })

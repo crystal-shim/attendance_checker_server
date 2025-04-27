@@ -19,12 +19,12 @@ class SchedulerService(
         RegularSchedule(
             dayOfWeek = DayOfWeek.WEDNESDAY,
             time = LocalTime.of(20, 30),
-            title = "수요일 저녁 출석체크"
+            title = "수요일 저녁 정기런"
         ),
         RegularSchedule(
             dayOfWeek = DayOfWeek.SATURDAY,
             time = LocalTime.of(8, 0),
-            title = "토요일 오전 출석체크"
+            title = "토요일 오전 정기런"
         )
     )
 
@@ -105,13 +105,7 @@ class SchedulerService(
 
     private suspend fun createSchedule(scheduleTime: ZonedDateTime, title: String): Schedule? {
         return try {
-            val urls = attendanceService.createAttendanceForm(title, scheduleTime.toLocalDateTime())
-            Schedule(
-                title = title,
-                scheduledTime = scheduleTime.toLocalDateTime().toString(),
-                formUrl = urls.formUrl,
-                responseUrl = urls.responseUrl
-            )
+            attendanceService.createAttendanceForm(title, scheduleTime.toLocalDateTime())
         } catch (e: Exception) {
             println("[Scheduler] Failed to create schedule: ${e.message}")
             null

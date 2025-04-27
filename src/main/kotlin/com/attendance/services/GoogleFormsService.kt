@@ -1,5 +1,6 @@
 package com.attendance.services
 
+import com.attendance.models.Schedule
 import com.google.api.client.auth.oauth2.Credential
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
@@ -14,6 +15,9 @@ import com.google.api.services.forms.v1.model.*
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 data class FormUrls(
     val formUrl: String,
@@ -53,12 +57,13 @@ class GoogleFormsService(
         return AuthorizationCodeInstalledApp(flow, receiver).authorize("user")
     }
 
-    suspend fun createAttendanceForm(scheduleId: Int, title: String): FormUrls {
+    fun createAttendanceForm(title: String, scheduledTime: LocalDateTime): FormUrls {
         // 폼 생성
+        val formTitle = "$title (${scheduledTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))})"
         val form = Form().apply {
             this.info = Info().apply {
-                this.title = "출석체크: $title"
-                this.documentTitle = "출석체크: $title"
+                this.title = formTitle
+                this.documentTitle = formTitle
             }
         }
 

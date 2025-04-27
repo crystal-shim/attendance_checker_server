@@ -12,6 +12,7 @@ import com.attendance.services.SchedulerService
 import io.ktor.http.*
 import io.ktor.server.util.*
 import java.time.LocalDateTime
+import java.util.*
 
 fun Application.configureRouting(attendanceService: AttendanceService, notionService: NotionService, schedulerService: SchedulerService) {
     routing {
@@ -33,13 +34,18 @@ fun Application.configureRouting(attendanceService: AttendanceService, notionSer
         // Create new schedule
         post("/schedule") {
             val request = call.receive<ScheduleRequest>()
-            val urls = attendanceService.createAttendanceForm(request.title, LocalDateTime.parse(request.scheduledTime))
-            call.respond(Schedule(
-                title = request.title,
-                scheduledTime = request.scheduledTime,
-                formUrl = urls.formUrl,
-                responseUrl = urls.responseUrl
-            ))
+            val schedule = attendanceService.createAttendanceForm(request.title, LocalDateTime.parse(request.scheduledTime))
+            if (schedule != null) {
+                call.respond(Schedule(
+                    id = UUID.randomUUID().toString(),
+                    title = request.title,
+                    scheduledTime = request.scheduledTime,
+                    formUrl = schedule.formUrl,
+                    responseUrl = schedule.responseUrl
+                ))
+            } else {
+                call.respondText("Failed to create schedule", status = HttpStatusCode.InternalServerError)
+            }
         }
 
         // Create schedules until next Sunday
