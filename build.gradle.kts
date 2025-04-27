@@ -87,6 +87,6 @@ tasks.named<Jar>("jar") {
 
 tasks.withType<Jar> {
     manifest {
-        attributes["Main-Class"] = "com.attendance.Application"
+        attributes["Main-Class"] = "com.attendance.ApplicationKt"
     }
 }
