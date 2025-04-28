@@ -1,5 +1,5 @@
 # 1. Build Stage
-FROM gradle:8.7-jdk20 AS build
+FROM gradle:8.7-jdk17 AS build
 
 # Gradle 캐시 최적화
 WORKDIR /app
