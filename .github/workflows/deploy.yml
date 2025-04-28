@@ -49,9 +49,12 @@ jobs:
           CREDENTIALS: ${{secrets.NOTION_CREDENTIALS}}
       - name: Install Railway CLI
         run: npm install -g @railway/cli
-      - name: Deploy to Railway
-        uses: bervProject/railway-deploy@main
+      - name: Link Railway Project
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
-        with:
-          service: "ELRC_attendance"
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }} 
+        run: railway link --project $RAILWAY_PROJECT_ID --service "ELRC_attendance"
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
+        run: railway up --service="ELRC_attendance"
