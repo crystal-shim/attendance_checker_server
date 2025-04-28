@@ -13,7 +13,7 @@ RUN gradle build --no-daemon || true
 COPY . .
 
 # Fat jar 빌드
-RUN gradle shadowJar --no-daemon
+RUN gradle fatJar --no-daemon
 
 # 2. Runtime Stage
 FROM openjdk:20-jdk
