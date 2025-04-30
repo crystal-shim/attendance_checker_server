@@ -72,7 +72,7 @@ tasks.test {
 }
 
 tasks.register<Jar>("fatJar") {
-    archiveClassifier.set("app.jar")
+    archiveFileName.set("app.jar")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes["Main-Class"] = "com.attendance.ApplicationKt"
