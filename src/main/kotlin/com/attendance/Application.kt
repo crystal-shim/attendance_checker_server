@@ -30,7 +30,7 @@ fun Application.module() {
         allowHost("127.0.0.1:3000")
         
         // 프로덕션 환경
-        allowHost("www.elrc.run")
+        allowHost("www.elrc.run", schemes = listOf("https"))
         
         // HTTP 메서드 허용
         allowMethod(HttpMethod.Options)
