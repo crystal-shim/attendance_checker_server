@@ -60,9 +60,16 @@ fun Application.module() {
     // Configure OpenAPI documentation
     configureOpenAPI()
 
-    // Read Notion credentials from file
-    val notionCredentialsFile = File("notion-credentials.json")
-    val notionCredentials = Json.decodeFromString<Map<String, String>>(notionCredentialsFile.readText())
+    val notionCredentials: Map<String, String> = if (System.getenv("RENDER") != null) {
+        // Render 배포 환경
+        val json = System.getenv("NOTION_CREDENTIALS")
+            ?: throw IllegalStateException("NOTION_CREDENTIALS environment variable is missing")
+        Json.decodeFromString(json)
+    } else {
+        // 로컬 개발 환경
+        val file = File("notion-credentials.json")
+        Json.decodeFromString(file.readText())
+    }
 
     val googleFormsService = GoogleFormsService(
         credentialsPath = "credentials.json",
