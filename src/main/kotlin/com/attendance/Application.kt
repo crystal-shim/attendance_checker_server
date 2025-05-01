@@ -72,7 +72,7 @@ fun Application.module() {
     }
 
     val googleFormsService = GoogleFormsService(
-        credentialsPath = "credentials.json",
+        credentialsPath = "/etc/secrets/credentials.json",
         tokensPath = "tokens"
     )
     val notionService = NotionService(
