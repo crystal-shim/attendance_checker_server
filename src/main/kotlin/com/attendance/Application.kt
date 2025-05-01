@@ -1,5 +1,6 @@
 package com.attendance
 
+import com.attendance.env.EnvLoader
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -60,24 +61,16 @@ fun Application.module() {
     // Configure OpenAPI documentation
     configureOpenAPI()
 
-    val notionCredentials: Map<String, String> = if (System.getenv("RENDER") != null) {
-        // Render 배포 환경
-        val json = System.getenv("NOTION_CREDENTIALS")
-            ?: throw IllegalStateException("NOTION_CREDENTIALS environment variable is missing")
-        Json.decodeFromString(json)
-    } else {
-        // 로컬 개발 환경
-        val file = File("notion-credentials.json")
-        Json.decodeFromString(file.readText())
-    }
+    val envLoader = EnvLoader()
 
     val googleFormsService = GoogleFormsService(
-        credentialsPath = "/etc/secrets/credentials.json",
-        tokensPath = "tokens"
+        clientId = envLoader.readEnv("GOOGLE_CLIENT_ID"),
+        clientSecret = envLoader.readEnv("GOOGLE_CLIENT_SECRET"),
+        refreshToken = envLoader.readEnv("GOOGLE_REFRESH_TOKEN")
     )
     val notionService = NotionService(
-        token = notionCredentials["token"] ?: throw IllegalStateException("Notion token not found in credentials file"),
-        databaseId = notionCredentials["database_id"] ?: throw IllegalStateException("Notion database ID not found in credentials file")
+        token = envLoader.readEnv("NOTION_API_TOKEN"),
+        databaseId = envLoader.readEnv("NOTION_DATABASE_ID")
     )
     val attendanceService = AttendanceService(googleFormsService, notionService)
     val schedulerService = SchedulerService(attendanceService)

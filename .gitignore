@@ -19,10 +19,5 @@ out/
 ### Mac OS ###
 .DS_Store
 
-### Google API Credentials ###
-credentials.json
-tokens/
-service-account.json
-
-### Notion Credentials ###
-notion-credentials.json 
+### Credentials ###
+.env

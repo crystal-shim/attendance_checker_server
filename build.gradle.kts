@@ -44,7 +44,7 @@ dependencies {
 
     // Google Forms API
     implementation("com.google.api-client:google-api-client:2.2.0")
-    implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.33.1")
     implementation("com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0")
 
     // Testing
@@ -64,6 +64,12 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-client-logging:$ktor_version")
+
+    implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
+}
+
+tasks.withType<JavaExec> {
+    environment("ENV", "development")
 }
 
 tasks.test {

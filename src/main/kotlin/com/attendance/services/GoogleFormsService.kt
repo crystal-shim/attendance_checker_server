@@ -1,64 +1,102 @@
 package com.attendance.services
 
-import com.attendance.models.Schedule
-import com.google.api.client.auth.oauth2.Credential
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
-import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.forms.v1.Forms
-import com.google.api.services.forms.v1.FormsScopes
 import com.google.api.services.forms.v1.model.*
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
+import com.google.auth.http.HttpCredentialsAdapter
+import com.google.auth.oauth2.AccessToken
+import com.google.auth.oauth2.UserCredentials
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import io.ktor.server.auth.OAuth2ResponseParameters.AccessToken
+import java.net.URI
+import java.net.URLEncoder
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Instant
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 data class FormUrls(
     val formUrl: String,
     val responseUrl: String
 )
 
+data class TokenResponse(
+    val access_token: String,
+    val expires_in: Int,
+    val token_type: String
+)
+
 class GoogleFormsService(
-    private val credentialsPath: String,
-    private val tokensPath: String
+    private val clientId: String,
+    private val clientSecret: String,
+    private val refreshToken: String
 ) {
     private val jsonFactory = GsonFactory.getDefaultInstance()
     private val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
-    private val scopes = listOf(FormsScopes.FORMS_BODY)
-    
-    private val forms by lazy {
-        val credentials = getCredentials()
-        Forms.Builder(httpTransport, jsonFactory, credentials)
-            .setApplicationName("Attendance Checker")
+
+    private var accessToken: String? = null
+    private var expiresAt: Instant = Instant.EPOCH
+
+    private fun getUserCredential(): UserCredentials {
+        val now = Instant.now()
+
+        // 토큰 만료 여부 확인
+        if (accessToken == null || now.isAfter(expiresAt)) {
+            val tokenResponse = fetchAccessToken()
+            println("TODO : remove this log : Access token fetched: $tokenResponse")
+            accessToken = tokenResponse.access_token
+            expiresAt = now.plusSeconds(tokenResponse.expires_in.toLong() - 30) // 30초 여유
+        }
+        println("TODO : remove this log : Access token used")
+
+        return UserCredentials.newBuilder()
+            .setClientId(clientId)
+            .setClientSecret(clientSecret)
+            .setRefreshToken(refreshToken)
+            .setAccessToken(AccessToken(accessToken, Date.from(expiresAt)))
             .build()
     }
 
-    private fun getCredentials(): Credential {
-        val credentialsFile = File(credentialsPath)
-        val clientSecrets = GoogleClientSecrets.load(
-            jsonFactory,
-            InputStreamReader(FileInputStream(credentialsFile))
-        )
+    private fun fetchAccessToken(): TokenResponse {
+        val url = "https://oauth2.googleapis.com/token"
+        val formParams = listOf(
+            "client_id" to clientId,
+            "client_secret" to clientSecret,
+            "refresh_token" to refreshToken,
+            "grant_type" to "refresh_token"
+        ).joinToString("&") { "${it.first}=${URLEncoder.encode(it.second, "UTF-8")}" }
 
-        val flow = GoogleAuthorizationCodeFlow.Builder(
-            httpTransport, jsonFactory, clientSecrets, scopes
-        )
-            .setDataStoreFactory(FileDataStoreFactory(File(tokensPath)))
-            .setAccessType("offline")
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .POST(HttpRequest.BodyPublishers.ofString(formParams))
             .build()
 
-        val receiver = LocalServerReceiver.Builder().setPort(8888).build()
-        return AuthorizationCodeInstalledApp(flow, receiver).authorize("user")
+        val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
+
+        if (response.statusCode() != 200) {
+            throw RuntimeException("Failed to fetch access token: ${response.body()}")
+        }
+
+        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        val adapter = moshi.adapter(TokenResponse::class.java)
+        val tokenResponse = adapter.fromJson(response.body())
+            ?: throw RuntimeException("Failed to parse token response")
+
+        return tokenResponse
     }
+
 
     fun createAttendanceForm(title: String, scheduledTime: LocalDateTime): FormUrls {
-        // 폼 생성
+        val credential = getUserCredential()
+        val forms = Forms.Builder(httpTransport, jsonFactory, HttpCredentialsAdapter(credential))
+            .setApplicationName("Attendance Checker")
+            .build()
         val formTitle = "$title (${scheduledTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))})"
         val form = Form().apply {
             this.info = Info().apply {
