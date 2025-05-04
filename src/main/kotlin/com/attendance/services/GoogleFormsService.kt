@@ -17,6 +17,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -92,7 +93,7 @@ class GoogleFormsService(
     }
 
 
-    fun createAttendanceForm(title: String, scheduledTime: LocalDateTime): FormUrls {
+    fun createAttendanceForm(title: String, scheduledTime: ZonedDateTime): FormUrls {
         val credential = getUserCredential()
         val forms = Forms.Builder(httpTransport, jsonFactory, HttpCredentialsAdapter(credential))
             .setApplicationName("Attendance Checker")

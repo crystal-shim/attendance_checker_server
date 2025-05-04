@@ -10,7 +10,7 @@ class AttendanceService(
     private val googleFormsService: GoogleFormsService,
     private val notionService: NotionService
 ) {
-    suspend fun createAttendanceForm(title: String, scheduledTime: LocalDateTime): Schedule? = try {
+    suspend fun createAttendanceForm(title: String, scheduledTime: ZonedDateTime): Schedule? = try {
         // Google Form 생성
         val id = UUID.randomUUID().toString()
         val urls = googleFormsService.createAttendanceForm(title, scheduledTime)

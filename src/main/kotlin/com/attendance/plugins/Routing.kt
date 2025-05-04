@@ -12,6 +12,7 @@ import com.attendance.services.SchedulerService
 import io.ktor.http.*
 import io.ktor.server.util.*
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.*
 
 fun Application.configureRouting(attendanceService: AttendanceService, notionService: NotionService, schedulerService: SchedulerService) {
@@ -34,7 +35,7 @@ fun Application.configureRouting(attendanceService: AttendanceService, notionSer
         // Create new schedule
         post("/schedule") {
             val request = call.receive<ScheduleRequest>()
-            val schedule = attendanceService.createAttendanceForm(request.title, LocalDateTime.parse(request.scheduledTime))
+            val schedule = attendanceService.createAttendanceForm(request.title, ZonedDateTime.parse(request.scheduledTime))
             if (schedule != null) {
                 call.respond(Schedule(
                     id = UUID.randomUUID().toString(),

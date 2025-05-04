@@ -105,7 +105,7 @@ class SchedulerService(
 
     private suspend fun createSchedule(scheduleTime: ZonedDateTime, title: String): Schedule? {
         return try {
-            attendanceService.createAttendanceForm(title, scheduleTime.toLocalDateTime())
+            attendanceService.createAttendanceForm(title, scheduleTime)
         } catch (e: Exception) {
             println("[Scheduler] Failed to create schedule: ${e.message}")
             null
