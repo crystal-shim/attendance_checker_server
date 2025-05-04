@@ -84,6 +84,7 @@ class NotionService(
                 put("Date", buildJsonObject {
                     put("date", buildJsonObject {
                         put("start", schedule.scheduledTime)
+                        put("time_zone", "Asia/Seoul")
                     })
                 })
                 put("id", buildJsonObject {

@@ -49,11 +49,9 @@ class GoogleFormsService(
         // 토큰 만료 여부 확인
         if (accessToken == null || now.isAfter(expiresAt)) {
             val tokenResponse = fetchAccessToken()
-            println("TODO : remove this log : Access token fetched: $tokenResponse")
             accessToken = tokenResponse.access_token
             expiresAt = now.plusSeconds(tokenResponse.expires_in.toLong() - 30) // 30초 여유
         }
-        println("TODO : remove this log : Access token used")
 
         return UserCredentials.newBuilder()
             .setClientId(clientId)
