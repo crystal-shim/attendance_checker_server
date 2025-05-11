@@ -17,6 +17,10 @@ import java.util.*
 
 fun Application.configureRouting(attendanceService: AttendanceService, notionService: NotionService, schedulerService: SchedulerService) {
     routing {
+        get("/health") {
+            call.respondText("OK")
+        }
+
         // Get schedule based on id
         get("/detail") {
             try {
