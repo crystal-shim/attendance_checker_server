@@ -26,10 +26,10 @@ class SchedulerService(
             time = LocalTime.of(8, 0),
             title = "토요일 오전 정기런"
         ),
-        // delete on 2024-01-01
+        // delete later
         RegularSchedule(
             dayOfWeek = DayOfWeek.MONDAY,
-            time = LocalTime.of(7, 40),
+            time = LocalTime.of(19, 40),
             title = "월요일 훈련"
         )
     )
